@@ -9,7 +9,7 @@ import java.util.List;
 
 public class BlockListTests {
     @Test
-    public void blocklist() {
+    public void blockList() {
         Sqids sqids = new Sqids();
         List<Long> numbers = Arrays.asList(4572721L);
         Assertions.assertEquals(sqids.decode("aho1e"), numbers);
@@ -17,7 +17,7 @@ public class BlockListTests {
     }
 
     @Test
-    public void emptyBlocklis() {
+    public void emptyBlockList() {
         SqidsOptions options = new SqidsOptions();
         options.BlockList = new HashSet<>();
         Sqids sqids = new Sqids(options);
@@ -27,7 +27,7 @@ public class BlockListTests {
     }
 
     @Test
-    public void nonEmptyBlocklis() {
+    public void nonEmptyBlockList() {
         SqidsOptions options = new SqidsOptions();
         options.BlockList = new HashSet<>(Arrays.asList("ArUO"));
         Sqids sqids = new Sqids(options);
@@ -42,7 +42,7 @@ public class BlockListTests {
     }
 
     @Test
-    public void encodeBlocklis() {
+    public void encodeBlockList() {
         SqidsOptions options = new SqidsOptions();
         options.BlockList = new HashSet<>(Arrays.asList(
                 "JSwXFaosAN", // normal result of 1st encoding, let's block that word on purpose
@@ -58,7 +58,7 @@ public class BlockListTests {
     }
 
     @Test
-    public void decodeBlocklis() {
+    public void decodeBlockList() {
         SqidsOptions options = new SqidsOptions();
         options.BlockList = new HashSet<>(Arrays.asList(
                 "86Rf07",
@@ -76,7 +76,7 @@ public class BlockListTests {
     }
 
     @Test
-    public void shortBlocklis() {
+    public void shortBlockList() {
         SqidsOptions options = new SqidsOptions();
         options.BlockList = new HashSet<>(Arrays.asList(
                 "pnd"));
@@ -86,7 +86,7 @@ public class BlockListTests {
     }
 
     @Test
-    public void lowercaseBlocklis() {
+    public void lowercaseBlockList() {
         SqidsOptions options = new SqidsOptions();
         options.Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         options.BlockList = new HashSet<>(Arrays.asList(
@@ -98,7 +98,7 @@ public class BlockListTests {
     }
 
     @Test
-    public void maxBlocklis() {
+    public void maxBlockList() {
         SqidsOptions options = new SqidsOptions();
         options.Alphabet = "abc";
         options.MinLength = 3;

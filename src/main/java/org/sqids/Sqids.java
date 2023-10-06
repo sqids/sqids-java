@@ -4,16 +4,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Sqids {
-    private String Alphabet;
-    private int MinLength;
-    private Set<String> BlockList;
-    private SqidsOptions defaultOptions = new SqidsOptions();
+    private final String Alphabet;
+    private final int MinLength;
+    private final Set<String> BlockList;
 
     public Sqids() {
         this(null);
     }
 
     public Sqids(SqidsOptions options) {
+        SqidsOptions defaultOptions = new SqidsOptions();
         String alphabet = (options != null && options.Alphabet != null) ? options.Alphabet : defaultOptions.Alphabet;
         int minLength = options != null ? options.MinLength : defaultOptions.MinLength;
         Set<String> blocklist = (options != null && options.BlockList != null) ? new HashSet<>(options.BlockList) : new HashSet<>(defaultOptions.BlockList);
@@ -59,7 +59,7 @@ public class Sqids {
         if (numbers.isEmpty()) {
             return "";
         }
-        long maxValue = maxValue();
+        long maxValue = Long.MAX_VALUE;
         List<Long> inRangeNumbers = numbers.stream()
                 .filter(n -> n >= 0 && n <= maxValue)
                 .collect(Collectors.toList());
@@ -71,7 +71,6 @@ public class Sqids {
 
     public List<Long> decode(String id) {
         List<Long> ret = new ArrayList<>();
-
         if (id.isEmpty()) {
             return ret;
         }
@@ -85,28 +84,23 @@ public class Sqids {
 
         char prefix = id.charAt(0);
         int offset = this.Alphabet.indexOf(prefix);
-        String modifiedAlphabet = this.Alphabet.substring(offset) + this.Alphabet.substring(0, offset);
-        modifiedAlphabet = new StringBuilder(modifiedAlphabet).reverse().toString();
+        String alphabet = new StringBuilder(this.Alphabet.substring(offset) + this.Alphabet.substring(0, offset)).reverse().toString();
         String slicedId = id.substring(1);
 
-        while (slicedId.length() > 0) {
-            char separator = modifiedAlphabet.charAt(0);
-
+        while (!slicedId.isEmpty()) {
+            char separator = alphabet.charAt(0);
             String[] chunks = slicedId.split(String.valueOf(separator), 2);
             if (chunks.length > 0) {
                 if (chunks[0].isEmpty()) {
                     return ret;
                 }
-
-                ret.add(toNumber(chunks[0], modifiedAlphabet.substring(1)));
+                ret.add(toNumber(chunks[0], alphabet.substring(1)));
                 if (chunks.length > 1) {
-                    modifiedAlphabet = shuffle(modifiedAlphabet);
+                    alphabet = shuffle(alphabet);
                 }
             }
-
             slicedId = chunks.length > 1 ? chunks[1] : "";
         }
-
         return ret;
     }
 
@@ -126,36 +120,34 @@ public class Sqids {
         offset %= this.Alphabet.length();
         offset = (offset + increment) % this.Alphabet.length();
 
-        String modifiedAlphabet = this.Alphabet.substring((int) offset) + this.Alphabet.substring(0, (int) offset);
-        char prefix = modifiedAlphabet.charAt(0);
-        modifiedAlphabet = new StringBuilder(modifiedAlphabet).reverse().toString();
+        String alphabet = this.Alphabet.substring((int) offset) + this.Alphabet.substring(0, (int) offset);
+        char prefix = alphabet.charAt(0);
+        alphabet = new StringBuilder(alphabet).reverse().toString();
         StringBuilder idBuilder = new StringBuilder().append(prefix);
-
         for (int i = 0; i < numbers.size(); i++) {
             long num = numbers.get(i);
-            idBuilder.append(toId(num, modifiedAlphabet.substring(1)));
+            idBuilder.append(toId(num, alphabet.substring(1)));
             if (i < numbers.size() - 1) {
-                idBuilder.append(modifiedAlphabet.charAt(0));
-                modifiedAlphabet = shuffle(modifiedAlphabet);
+                idBuilder.append(alphabet.charAt(0));
+                alphabet = shuffle(alphabet);
             }
         }
 
-        String id = idBuilder.toString();
+        StringBuilder id = new StringBuilder(idBuilder.toString());
 
         if (this.MinLength > id.length()) {
-            id += modifiedAlphabet.charAt(0);
-
+            id.append(alphabet.charAt(0));
             while (this.MinLength - id.length() > 0) {
-                modifiedAlphabet = shuffle(modifiedAlphabet);
-                id += modifiedAlphabet.substring(0, Math.min(this.MinLength - id.length(), modifiedAlphabet.length()));
+                alphabet = shuffle(alphabet);
+                id.append(alphabet, 0, Math.min(this.MinLength - id.length(), alphabet.length()));
             }
         }
 
-        if (isBlockedId(id)) {
-            id = encodeNumbers(numbers, increment + 1);
+        if (isBlockedId(id.toString())) {
+            id = new StringBuilder(encodeNumbers(numbers, increment + 1));
         }
 
-        return id;
+        return id.toString();
     }
 
     private String shuffle(String alphabet) {
@@ -170,23 +162,6 @@ public class Sqids {
 
         return new String(chars);
     }
-
-//    private String toId(long num, String alphabet) {
-//        List<Character> id = new ArrayList<>();
-//        char[] chars = alphabet.toCharArray();
-//
-//        long result = num;
-//        do {
-//            id.add(0, chars[(int) result % chars.length]);
-//            result = result / chars.length;
-//        } while (result > 0);
-//
-//        StringBuilder idBuilder = new StringBuilder();
-//        for (char c : id) {
-//            idBuilder.append(c);
-//        }
-//        return idBuilder.toString();
-//    }
 
     private String toId(long num, String alphabet) {
         StringBuilder id = new StringBuilder();
@@ -232,7 +207,4 @@ public class Sqids {
         return false;
     }
 
-    private long maxValue() {
-        return Long.MAX_VALUE;
-    }
 }
