@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 
 public class MinLengthTests {
-    int minLength = new SqidsOptions().Alphabet.length();
+    final int minLength = new SqidsOptions().Alphabet.length();
 
     @Test
     public void simple() {

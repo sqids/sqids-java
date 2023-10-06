@@ -109,7 +109,7 @@ public class EncodeTests {
     }
 
     @Test
-    public void decodInvalidCharacter() {
+    public void decodeInvalidCharacter() {
         Sqids sqids = new Sqids();
         List<Long> numbers = new ArrayList<>();
         Assertions.assertEquals(sqids.decode("*"), numbers);
@@ -118,7 +118,6 @@ public class EncodeTests {
     @Test
     public void encodeOutOfRangeNumbers() {
         Sqids sqids = new Sqids();
-        List<Long> numbers = new ArrayList<>();
         Assertions.assertThrows(RuntimeException.class, () -> sqids.encode(Arrays.asList(-1L)));
         Assertions.assertThrows(RuntimeException.class, () -> sqids.encode(Arrays.asList(Long.MAX_VALUE + 1)));
     }

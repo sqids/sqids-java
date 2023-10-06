@@ -27,6 +27,11 @@ Not good for:
 - Sensitive data (this is not an encryption library)
 - User IDs (can be decoded revealing user count)
 
+
+## System Requirements
+Java 8 or higher is required.
+
+
 ## 🚀 Getting started
 
 Download and Import Sqids via:
@@ -40,9 +45,9 @@ import org.sqids.*;
 Simple encode & decode:
 
 ```java
-Sqids sqids=new Sqids();
-String id=sqids.encode(Arrays.asList(1L,2L,3L)) // "86Rf07"
-List<Long> numbers=sqids.decode(id) // [1, 2, 3]
+Sqids sqids = new Sqids();
+String id = sqids.encode(Arrays.asList(1L,2L,3L)); // "86Rf07"
+List<Long> numbers = sqids.decode(id); // [1, 2, 3]
 ```
 
 > **Note**
@@ -53,31 +58,31 @@ List<Long> numbers=sqids.decode(id) // [1, 2, 3]
 Enforce a *minimum* length for IDs:
 
 ```java
-SqidsOptions options=new SqidsOptions();
-options.MinLength=10;
-Sqids sqids=new Sqids(options);
-String id=sqids.encode(Arrays.asList(1L,2L,3L)) // "86Rf07xd4z"
-List<Long> numbers=sqids.decode(id) // [1, 2, 3]
+SqidsOptions options = new SqidsOptions();
+options.MinLength = 10;
+Sqids sqids = new Sqids(options);
+String id = sqids.encode(Arrays.asList(1L,2L,3L)); // "86Rf07xd4z"
+List<Long> numbers = sqids.decode(id); // [1, 2, 3]
 ```
 
 Randomize IDs by providing a custom alphabet:
 
 ```java
-SqidsOptions options=new SqidsOptions();
-options.Alphabet="FxnXM1kBN6cuhsAvjW3Co7l2RePyY8DwaU04Tzt9fHQrqSVKdpimLGIJOgb5ZE";
-Sqids sqids=new Sqids(options);
-String id=sqids.encode(Arrays.asList(1L,2L,3L)) // "B4aajs"
-List<Long> numbers=sqids.decode(id) // [1, 2, 3]
+SqidsOptions options = new SqidsOptions();
+options.Alphabet = "FxnXM1kBN6cuhsAvjW3Co7l2RePyY8DwaU04Tzt9fHQrqSVKdpimLGIJOgb5ZE";
+Sqids sqids = new Sqids(options);
+String id = sqids.encode(Arrays.asList(1L,2L,3L)); // "B4aajs"
+List<Long> numbers = sqids.decode(id); // [1, 2, 3]
 ```
 
 Prevent specific words from appearing anywhere in the auto-generated IDs:
 
 ```java
-SqidsOptions options=new SqidsOptions();
-options.BlockList=new HashSet<>(Arrays.asList("86Rf07"));
-Sqids sqids=new Sqids(options);
-String id=sqids.encode(Arrays.asList(1L,2L,3L)) // "se8ojk"
-List<Long> numbers=sqids.decode(id) // [1, 2, 3]
+SqidsOptions options = new SqidsOptions();
+options.BlockList = new HashSet<>(Arrays.asList("86Rf07"));
+Sqids sqids = new Sqids(options);
+String id = sqids.encode(Arrays.asList(1L,2L,3L)); // "se8ojk"
+List<Long> numbers = sqids.decode(id); // [1, 2, 3]
 ```
 
 ## 📝 License
