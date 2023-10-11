@@ -9,9 +9,9 @@ import java.util.List;
 public class AlphabetTests {
     @Test
     public void simpleAlphabet() {
-        SqidsOptions options = new SqidsOptions();
-        options.Alphabet = "0123456789abcdef";
-        Sqids sqids = new Sqids(options);
+        Sqids sqids = Sqids.builder()
+                .alphabet("0123456789abcdef")
+                .build();
         List<Long> numbers = Arrays.asList(1L, 2L, 3L);
         String id = "489158";
         Assertions.assertEquals(sqids.encode(numbers), id);
@@ -20,32 +20,32 @@ public class AlphabetTests {
 
     @Test
     public void shortAlphabet() {
-        SqidsOptions options = new SqidsOptions();
-        options.Alphabet = "abc";
-        Sqids sqids = new Sqids(options);
+        Sqids sqids = Sqids.builder()
+                .alphabet("abc")
+                .build();
         List<Long> numbers = Arrays.asList(1L, 2L, 3L);
         Assertions.assertEquals(sqids.decode(sqids.encode(numbers)), numbers);
     }
 
     @Test
     public void multibyteCharacters() {
-        SqidsOptions options = new SqidsOptions();
-        options.Alphabet = "ë1092";
-        Assertions.assertThrows(IllegalArgumentException.class, () -> new Sqids(options));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Sqids.builder()
+                .alphabet("ë1092")
+                .build());
     }
 
     @Test
     public void repeatingAlphabetCharacters() {
-        SqidsOptions options = new SqidsOptions();
-        options.Alphabet = "aabcdefg";
-        Assertions.assertThrows(IllegalArgumentException.class, () -> new Sqids(options));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Sqids.builder()
+                .alphabet("aabcdefg")
+                .build());
     }
 
     @Test
     public void tooShortOfAnAlphabet() {
-        SqidsOptions options = new SqidsOptions();
-        options.Alphabet = "ab";
-        Assertions.assertThrows(IllegalArgumentException.class, () -> new Sqids(options));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Sqids.builder()
+                .alphabet("ab")
+                .build());
     }
 
 }

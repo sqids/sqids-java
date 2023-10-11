@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 
 public class MinLengthTests {
-    final int minLength = new SqidsOptions().Alphabet.length();
+    private final int minLength = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".length();
 
     @Test
     public void simple() {
-        SqidsOptions options = new SqidsOptions();
-        options.MinLength = minLength;
-        Sqids sqids = new Sqids(options);
+        Sqids sqids = Sqids.builder()
+                .minLength(minLength)
+                .build();
         List<Long> numbers = Arrays.asList(1L, 2L, 3L);
         String id = "86Rf07xd4zBmiJXQG6otHEbew02c3PWsUOLZxADhCpKj7aVFv9I8RquYrNlSTM";
         Assertions.assertEquals(sqids.encode(numbers), id);
@@ -38,11 +38,11 @@ public class MinLengthTests {
                 put(minLength + 3, "86Rf07xd4zBmiJXQG6otHEbew02c3PWsUOLZxADhCpKj7aVFv9I8RquYrNlSTMyf1");
             }
         };
-        for (Integer minLen : ids.keySet()) {
-            SqidsOptions options = new SqidsOptions();
-            options.MinLength = minLen;
-            Sqids sqids = new Sqids(options);
-            String id = ids.get(minLen);
+        for (Integer minLength : ids.keySet()) {
+            Sqids sqids = Sqids.builder()
+                    .minLength(minLength)
+                    .build();
+            String id = ids.get(minLength);
             Assertions.assertEquals(sqids.encode(numbers), id);
             Assertions.assertEquals(sqids.decode(id), numbers);
         }
@@ -50,9 +50,9 @@ public class MinLengthTests {
 
     @Test
     public void incrementalNumbers() {
-        SqidsOptions options = new SqidsOptions();
-        options.MinLength = minLength;
-        Sqids sqids = new Sqids(options);
+        Sqids sqids = Sqids.builder()
+                .minLength(minLength)
+                .build();
         Map<String, List<Long>> ids = new HashMap<String, List<Long>>() {
             {
                 put("SvIzsqYMyQwI3GWgJAe17URxX8V924Co0DaTZLtFjHriEn5bPhcSkfmvOslpBu", Arrays.asList(0L, 0L));
@@ -86,9 +86,9 @@ public class MinLengthTests {
             add(Arrays.asList((long) Integer.MAX_VALUE));
         }};
         for (Integer minLength : minLengths) {
-            SqidsOptions options = new SqidsOptions();
-            options.MinLength = minLength;
-            Sqids sqids = new Sqids(options);
+            Sqids sqids = Sqids.builder()
+                    .minLength(minLength)
+                    .build();
             for (List<Long> number : numbers) {
                 String id = sqids.encode(number);
                 Assertions.assertTrue(id.length() >= minLength);
@@ -99,11 +99,12 @@ public class MinLengthTests {
 
     @Test
     public void encodeOutOfRangeNumbers() {
-         int minLengthLimit = 255;
-        SqidsOptions options = new SqidsOptions();
-        options.MinLength = -1;
-        Assertions.assertThrows(RuntimeException.class, () -> new Sqids(options));
-        options.MinLength = minLengthLimit + 1;
-        Assertions.assertThrows(RuntimeException.class, () -> new Sqids(options));
+        int minLengthLimit = 255;
+        Assertions.assertThrows(RuntimeException.class, () -> Sqids.builder()
+                .minLength(-1)
+                .build());
+        Assertions.assertThrows(RuntimeException.class, () -> Sqids.builder()
+                .minLength(minLengthLimit + 1)
+                .build());
     }
 }

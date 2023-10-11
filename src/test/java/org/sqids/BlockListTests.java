@@ -10,7 +10,8 @@ import java.util.List;
 public class BlockListTests {
     @Test
     public void blockList() {
-        Sqids sqids = new Sqids();
+        Sqids sqids = Sqids.builder()
+                .build();
         List<Long> numbers = Arrays.asList(4572721L);
         Assertions.assertEquals(sqids.decode("aho1e"), numbers);
         Assertions.assertEquals(sqids.encode(numbers), "JExTR");
@@ -18,9 +19,9 @@ public class BlockListTests {
 
     @Test
     public void emptyBlockList() {
-        SqidsOptions options = new SqidsOptions();
-        options.BlockList = new HashSet<>();
-        Sqids sqids = new Sqids(options);
+        Sqids sqids = Sqids.builder()
+                .blockList(new HashSet<>())
+                .build();
         List<Long> numbers = Arrays.asList(4572721L);
         Assertions.assertEquals(sqids.decode("aho1e"), numbers);
         Assertions.assertEquals(sqids.encode(numbers), "aho1e");
@@ -28,9 +29,9 @@ public class BlockListTests {
 
     @Test
     public void nonEmptyBlockList() {
-        SqidsOptions options = new SqidsOptions();
-        options.BlockList = new HashSet<>(Arrays.asList("ArUO"));
-        Sqids sqids = new Sqids(options);
+        Sqids sqids = Sqids.builder()
+                .blockList(new HashSet<>(Arrays.asList("ArUO")))
+                .build();
         List<Long> numbers = Arrays.asList(4572721L);
         Assertions.assertEquals(sqids.decode("aho1e"), numbers);
         Assertions.assertEquals(sqids.encode(numbers), "aho1e");
@@ -43,15 +44,15 @@ public class BlockListTests {
 
     @Test
     public void encodeBlockList() {
-        SqidsOptions options = new SqidsOptions();
-        options.BlockList = new HashSet<>(Arrays.asList(
-                "JSwXFaosAN", // normal result of 1st encoding, let's block that word on purpose
-                "OCjV9JK64o", // result of 2nd encoding
-                "rBHf", // result of 3rd encoding is `4rBHfOiqd3`, let's block a substring
-                "79SM", // result of 4th encoding is `dyhgw479SM`, let's block the postfix
-                "7tE6" // result of 4th encoding is `7tE6jdAHLe`, let's block the prefix
-        ));
-        Sqids sqids = new Sqids(options);
+        Sqids sqids = Sqids.builder()
+                .blockList(new HashSet<>(Arrays.asList(
+                        "JSwXFaosAN", // normal result of 1st encoding, let's block that word on purpose
+                        "OCjV9JK64o", // result of 2nd encoding
+                        "rBHf", // result of 3rd encoding is `4rBHfOiqd3`, let's block a substring
+                        "79SM", // result of 4th encoding is `dyhgw479SM`, let's block the postfix
+                        "7tE6" // result of 4th encoding is `7tE6jdAHLe`, let's block the prefix
+                )))
+                .build();
         List<Long> numbers = Arrays.asList(1000000L, 2000000L);
         Assertions.assertEquals(sqids.encode(numbers), "1aYeB7bRUt");
         Assertions.assertEquals(sqids.decode("1aYeB7bRUt"), numbers);
@@ -59,14 +60,15 @@ public class BlockListTests {
 
     @Test
     public void decodeBlockList() {
-        SqidsOptions options = new SqidsOptions();
-        options.BlockList = new HashSet<>(Arrays.asList(
-                "86Rf07",
-                "se8ojk",
-                "ARsz1p",
-                "Q8AI49",
-                "5sQRZO"));
-        Sqids sqids = new Sqids(options);
+        Sqids sqids = Sqids.builder()
+                .blockList(new HashSet<>(Arrays.asList(
+                        "86Rf07",
+                        "se8ojk",
+                        "ARsz1p",
+                        "Q8AI49",
+                        "5sQRZO"
+                )))
+                .build();
         List<Long> numbers = Arrays.asList(1L, 2L, 3L);
         Assertions.assertEquals(sqids.decode("86Rf07"), numbers);
         Assertions.assertEquals(sqids.decode("se8ojk"), numbers);
@@ -77,21 +79,19 @@ public class BlockListTests {
 
     @Test
     public void shortBlockList() {
-        SqidsOptions options = new SqidsOptions();
-        options.BlockList = new HashSet<>(Arrays.asList(
-                "pnd"));
-        Sqids sqids = new Sqids(options);
+        Sqids sqids = Sqids.builder()
+                .blockList(new HashSet<>(Arrays.asList("pnd")))
+                .build();
         List<Long> numbers = Arrays.asList(1000L);
         Assertions.assertEquals(sqids.decode(sqids.encode(numbers)), numbers);
     }
 
     @Test
     public void lowercaseBlockList() {
-        SqidsOptions options = new SqidsOptions();
-        options.Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        options.BlockList = new HashSet<>(Arrays.asList(
-                "sxnzkl"));
-        Sqids sqids = new Sqids(options);
+        Sqids sqids = Sqids.builder()
+                .alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+                .blockList(new HashSet<>(Arrays.asList("sxnzkl")))
+                .build();
         List<Long> numbers = Arrays.asList(1L, 2L, 3L);
         Assertions.assertEquals(sqids.encode(numbers), "IBSHOZ");
         Assertions.assertEquals(sqids.decode("IBSHOZ"), numbers);
@@ -99,15 +99,14 @@ public class BlockListTests {
 
     @Test
     public void maxBlockList() {
-        SqidsOptions options = new SqidsOptions();
-        options.Alphabet = "abc";
-        options.MinLength = 3;
-        options.BlockList = new HashSet<>(Arrays.asList(
-                "cab",
-                "abc",
-                "bca"));
-        Sqids sqids = new Sqids(options);
-        List<Long> numbers = Arrays.asList(0L);
-        Assertions.assertThrows(RuntimeException.class, () -> sqids.encode(numbers));
+        Sqids sqids = Sqids.builder()
+                .alphabet("abc")
+                .minLength(3)
+                .blockList(new HashSet<>(Arrays.asList(
+                        "cab",
+                        "abc",
+                        "bca")))
+                .build();
+        Assertions.assertThrows(RuntimeException.class, () -> sqids.encode(Arrays.asList(0L)));
     }
 }
