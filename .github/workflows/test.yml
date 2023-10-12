@@ -20,6 +20,4 @@ jobs:
         distribution: 'temurin'
     - uses: gradle/gradle-build-action@v2
       with:
-        arguments: build
-    - name: Execute Gradle test
-      run: ./gradlew test
+        arguments: test
