@@ -19,4 +19,5 @@ jobs:
         java-version: '8'
         distribution: 'temurin'
     - uses: gradle/gradle-build-action@v2
-    - run: gradle wrapper
+      with:
+        arguments: wrapper
