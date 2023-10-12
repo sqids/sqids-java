@@ -21,5 +21,4 @@ jobs:
         cache: 'gradle'
     - uses: gradle/wrapper-validation-action@v1
     - uses: gradle/gradle-build-action@v2
-      with:
-        arguments: test
+    - run: gradle build
