@@ -46,8 +46,8 @@ Simple encode & decode:
 
 ```java
 Sqids sqids=Sqids.builder().build();
-String id = sqids.encode(Arrays.asList(1L,2L,3L)); // "86Rf07"
-List<Long> numbers = sqids.decode(id); // [1, 2, 3]
+String id=sqids.encode(Arrays.asList(1L,2L,3L)); // "86Rf07"
+List<Long> numbers=sqids.decode(id); // [1, 2, 3]
 ```
 
 > **Note**
@@ -61,8 +61,8 @@ Enforce a *minimum* length for IDs:
 Sqids sqids=Sqids.builder()
         .minLength(10)
         .build();
-String id = sqids.encode(Arrays.asList(1L,2L,3L)); // "86Rf07xd4z"
-List<Long> numbers = sqids.decode(id); // [1, 2, 3]
+String id=sqids.encode(Arrays.asList(1L,2L,3L)); // "86Rf07xd4z"
+List<Long> numbers=sqids.decode(id); // [1, 2, 3]
 ```
 
 Randomize IDs by providing a custom alphabet:
@@ -71,8 +71,8 @@ Randomize IDs by providing a custom alphabet:
 Sqids sqids=Sqids.builder()
         .alphabet("FxnXM1kBN6cuhsAvjW3Co7l2RePyY8DwaU04Tzt9fHQrqSVKdpimLGIJOgb5ZE")
         .build();
-String id = sqids.encode(Arrays.asList(1L,2L,3L)); // "B4aajs"
-List<Long> numbers = sqids.decode(id); // [1, 2, 3]
+String id=sqids.encode(Arrays.asList(1L,2L,3L)); // "B4aajs"
+List<Long> numbers=sqids.decode(id); // [1, 2, 3]
 ```
 
 Prevent specific words from appearing anywhere in the auto-generated IDs:
@@ -81,8 +81,8 @@ Prevent specific words from appearing anywhere in the auto-generated IDs:
 Sqids sqids=Sqids.builder()
         .blockList(new HashSet<>(Arrays.asList("86Rf07")))
         .build();
-String id = sqids.encode(Arrays.asList(1L,2L,3L)); // "se8ojk"
-List<Long> numbers = sqids.decode(id); // [1, 2, 3]
+String id=sqids.encode(Arrays.asList(1L,2L,3L)); // "se8ojk"
+List<Long> numbers=sqids.decode(id); // [1, 2, 3]
 ```
 
 ## 📝 License
