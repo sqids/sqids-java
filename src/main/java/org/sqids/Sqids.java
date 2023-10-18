@@ -10,19 +10,20 @@ public class Sqids {
 
     private Sqids(Builder builder) {
         String alphabet = builder.Alphabet;
+        int alphabetLength = alphabet.length();
         int minLength = builder.MinLength;
         Set<String> blockList = new HashSet<>(builder.BlockList);
 
-        if (alphabet.getBytes().length != alphabet.length()) {
+        if (alphabet.getBytes().length != alphabetLength) {
             throw new IllegalArgumentException("Alphabet cannot contain multibyte characters");
         }
 
         int minAlphabetLength = 3;
-        if (alphabet.length() < minAlphabetLength) {
+        if (alphabetLength < minAlphabetLength) {
             throw new IllegalArgumentException("Alphabet length must be at least " + minAlphabetLength);
         }
 
-        if (new HashSet<>(Arrays.asList(alphabet.split(""))).size() != alphabet.length()) {
+        if (new HashSet<>(Arrays.asList(alphabet.split(""))).size() != alphabetLength) {
             throw new IllegalArgumentException("Alphabet must contain unique characters");
         }
 
