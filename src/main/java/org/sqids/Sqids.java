@@ -1,10 +1,10 @@
 package org.sqids;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Sqids {
     private final String Alphabet;
+    private final int AlphabetLength;
     private final int MinLength;
     private final Set<String> BlockList;
 
@@ -46,6 +46,7 @@ public class Sqids {
         }
 
         this.Alphabet = this.shuffle(alphabet);
+        this.AlphabetLength = this.Alphabet.length();
         this.MinLength = minLength;
         this.BlockList = filteredBlockList;
     }
@@ -58,13 +59,12 @@ public class Sqids {
         if (numbers.isEmpty()) {
             return "";
         }
-        List<Long> inRangeNumbers = numbers.stream()
-                .filter(n -> n >= 0)
-                .collect(Collectors.toList());
-        if (inRangeNumbers.size() != numbers.size()) {
-            throw new RuntimeException("Encoding supports numbers between 0 and " + Long.MAX_VALUE);
+        for (Long num : numbers) {
+            if (num < 0) {
+                throw new RuntimeException("Encoding supports numbers between 0 and " + Long.MAX_VALUE);
+            }
         }
-        return encodeNumbers(inRangeNumbers);
+        return encodeNumbers(numbers);
     }
 
     public List<Long> decode(String id) {
@@ -74,30 +74,35 @@ public class Sqids {
         }
 
         char[] alphabetChars = this.Alphabet.toCharArray();
+        Set<Character> alphabetSet = new HashSet<>();
+        for (char c : alphabetChars) {
+            alphabetSet.add(c);
+        }
         for (char c : id.toCharArray()) {
-            if (!new String(alphabetChars).contains(String.valueOf(c))) {
+            if (!alphabetSet.contains(c)) {
                 return ret;
             }
         }
 
         char prefix = id.charAt(0);
         int offset = this.Alphabet.indexOf(prefix);
-        String alphabet = new StringBuilder(this.Alphabet.substring(offset) + this.Alphabet.substring(0, offset)).reverse().toString();
+        String alphabet = new StringBuilder(this.Alphabet.substring(offset)).append(this.Alphabet, 0, offset).reverse().toString();
         String slicedId = id.substring(1);
 
         while (!slicedId.isEmpty()) {
             char separator = alphabet.charAt(0);
             String[] chunks = slicedId.split(String.valueOf(separator), 2);
-            if (chunks.length > 0) {
+            int chunksLength = chunks.length;
+            if (chunksLength > 0) {
                 if (chunks[0].isEmpty()) {
                     return ret;
                 }
                 ret.add(toNumber(chunks[0], alphabet.substring(1)));
-                if (chunks.length > 1) {
+                if (chunksLength > 1) {
                     alphabet = shuffle(alphabet);
                 }
             }
-            slicedId = chunks.length > 1 ? chunks[1] : "";
+            slicedId = chunksLength > 1 ? chunks[1] : "";
         }
         return ret;
     }
@@ -107,25 +112,26 @@ public class Sqids {
     }
 
     private String encodeNumbers(List<Long> numbers, int increment) {
-        if (increment > this.Alphabet.length()) {
+        if (increment > this.AlphabetLength) {
             throw new RuntimeException("Reached max attempts to re-generate the ID");
         }
 
         long offset = numbers.size();
         for (int i = 0; i < numbers.size(); i++) {
-            offset = offset + this.Alphabet.charAt((int) (numbers.get(i) % this.Alphabet.length())) + i;
+            offset = offset + this.Alphabet.charAt((int) (numbers.get(i) % this.AlphabetLength)) + i;
         }
-        offset %= this.Alphabet.length();
-        offset = (offset + increment) % this.Alphabet.length();
+        offset %= this.AlphabetLength;
+        offset = (offset + increment) % this.AlphabetLength;
 
         String alphabet = this.Alphabet.substring((int) offset) + this.Alphabet.substring(0, (int) offset);
         char prefix = alphabet.charAt(0);
         alphabet = new StringBuilder(alphabet).reverse().toString();
         StringBuilder idBuilder = new StringBuilder().append(prefix);
-        for (int i = 0; i < numbers.size(); i++) {
+        int numberSize = numbers.size();
+        for (int i = 0; i < numberSize; i++) {
             long num = numbers.get(i);
             idBuilder.append(toId(num, alphabet.substring(1)));
-            if (i < numbers.size() - 1) {
+            if (i < numberSize - 1) {
                 idBuilder.append(alphabet.charAt(0));
                 alphabet = shuffle(alphabet);
             }
@@ -150,9 +156,9 @@ public class Sqids {
 
     private String shuffle(String alphabet) {
         char[] chars = alphabet.toCharArray();
-
-        for (int i = 0, j = chars.length - 1; j > 0; i++, j--) {
-            int r = (i * j + chars[i] + chars[j]) % chars.length;
+        int charLength = chars.length;
+        for (int i = 0, j = charLength - 1; j > 0; i++, j--) {
+            int r = (i * j + chars[i] + chars[j]) % charLength;
             char temp = chars[i];
             chars[i] = chars[r];
             chars[r] = temp;
@@ -164,10 +170,11 @@ public class Sqids {
     private String toId(long num, String alphabet) {
         StringBuilder id = new StringBuilder();
         char[] chars = alphabet.toCharArray();
+        int charLength = chars.length;
 
         do {
-            id.append(chars[(int) (num % chars.length)]);
-            num /= chars.length;
+            id.append(chars[(int) (num % charLength)]);
+            num /= charLength;
         } while (num > 0);
 
         return id.reverse().toString();
@@ -175,10 +182,11 @@ public class Sqids {
 
     private long toNumber(String id, String alphabet) {
         char[] chars = alphabet.toCharArray();
+        int charLength = chars.length;
         long number = 0;
 
         for (char c : id.toCharArray()) {
-            number = number * chars.length + new String(chars).indexOf(c);
+            number = number * charLength + alphabet.indexOf(c);
         }
 
         return number;
@@ -193,7 +201,7 @@ public class Sqids {
                     if (lowercaseId.equals(word)) {
                         return true;
                     }
-                } else if (word.matches("\\d+")) {
+                } else if (Character.isDigit(word.charAt(0))) {
                     if (lowercaseId.startsWith(word) || lowercaseId.endsWith(word)) {
                         return true;
                     }
