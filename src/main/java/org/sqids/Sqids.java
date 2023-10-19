@@ -124,21 +124,19 @@ public class Sqids {
         offset %= this.AlphabetLength;
         offset = (offset + increment) % this.AlphabetLength;
 
-        String alphabet = this.Alphabet.substring((int) offset) + this.Alphabet.substring(0, (int) offset);
-        char prefix = alphabet.charAt(0);
-        alphabet = new StringBuilder(alphabet).reverse().toString();
-        StringBuilder idBuilder = new StringBuilder().append(prefix);
+        StringBuilder alphabetB = new StringBuilder(this.Alphabet.substring((int) offset)).append(this.Alphabet, 0, (int) offset);
+        char prefix = alphabetB.charAt(0);
+        String alphabet = alphabetB.reverse().toString();
+        StringBuilder id = new StringBuilder().append(prefix);
         int numberSize = numbers.size();
         for (int i = 0; i < numberSize; i++) {
             long num = numbers.get(i);
-            idBuilder.append(toId(num, alphabet.substring(1)));
+            id.append(toId(num, alphabet.substring(1)));
             if (i < numberSize - 1) {
-                idBuilder.append(alphabet.charAt(0));
+                id.append(alphabet.charAt(0));
                 alphabet = shuffle(alphabet);
             }
         }
-
-        StringBuilder id = new StringBuilder(idBuilder.toString());
 
         if (this.MinLength > id.length()) {
             id.append(alphabet.charAt(0));
@@ -149,7 +147,8 @@ public class Sqids {
         }
 
         if (isBlockedId(id.toString())) {
-            id = new StringBuilder(encodeNumbers(numbers, increment + 1));
+            id.setLength(0);
+            id.append(encodeNumbers(numbers, increment + 1));
         }
 
         return id.toString();
@@ -168,7 +167,7 @@ public class Sqids {
         return new String(chars);
     }
 
-    private String toId(long num, String alphabet) {
+    private StringBuilder toId(long num, String alphabet) {
         StringBuilder id = new StringBuilder();
         char[] chars = alphabet.toCharArray();
         int charLength = chars.length;
@@ -178,7 +177,7 @@ public class Sqids {
             num /= charLength;
         } while (num > 0);
 
-        return id.reverse().toString();
+        return id.reverse();
     }
 
     private long toNumber(String id, String alphabet) {
