@@ -14,7 +14,7 @@ import java.util.stream.Stream;
  * <p>
  * This is the Java implementation of https://github.com/sqids/sqids-spec.
  *
- * This implementation is immutable, thread-safe, no lock is necessary.
+ * This implementation is immutable and thread-safe, no lock is necessary.
  */
 public class Sqids {
     private static final int MIN_ALPHABET_LENGTH = 3;
@@ -27,10 +27,10 @@ public class Sqids {
     private final Set<String> blockList;
 
     private Sqids(final Builder builder) {
-        String alphabet = builder.alphabet;
-        int alphabetLength = alphabet.length();
-        int minLength = builder.minLength;
-        Set<String> blockList = new HashSet<>(builder.blockList);
+        final String alphabet = builder.alphabet;
+        final int alphabetLength = alphabet.length();
+        final int minLength = builder.minLength;
+        final Set<String> blockList = new HashSet<>(builder.blockList);
 
         if (alphabet.getBytes().length != alphabetLength) {
             throw new IllegalArgumentException("Alphabet cannot contain multibyte characters");
@@ -48,8 +48,8 @@ public class Sqids {
             throw new IllegalArgumentException("Minimum length has to be between 0 and " + MIN_LENGTH_LIMIT);
         }
 
-        Set<String> filteredBlockList = new HashSet<>();
-        List<String> alphabetChars = new ArrayList<>(Arrays.asList(alphabet.toLowerCase().split("")));
+        final Set<String> filteredBlockList = new HashSet<>();
+        final List<String> alphabetChars = new ArrayList<>(Arrays.asList(alphabet.toLowerCase().split("")));
         for (String word : blockList) {
             if (word.length() >= MIN_BLOCK_LIST_WORD_LENGTH) {
                 word = word.toLowerCase();
