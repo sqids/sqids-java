@@ -1,9 +1,14 @@
 plugins {
-    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
 }
 
 group = 'org.sqids'
-version = '1.0.0'
+version = '1.0.0-SNAPSHOT'
+
+String rootArtifactiId = 'sqids'
+String projectUrl = 'https://sqids.org/java'
 
 repositories {
     mavenCentral()
@@ -12,8 +17,72 @@ repositories {
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 test {
     useJUnitPlatform()
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+
+        mavenJava(MavenPublication) {
+            groupId = group
+            artifactId = rootArtifactiId
+            version = version
+            from components.java
+            pom {
+                name = 'Sqids'
+                description = 'Generate short YouTube-looking IDs from numbers.'
+                url = projectUrl
+                properties = [
+                    "parent.groupId": "org.sonatype.oss",
+                    "parent.artifactId": "oss-parent",
+                    "parent.version": "7"
+                ]
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://github.com/sqids/sqids-java/blob/main/LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        id = '0x3333'
+                        name = 'Tercio Gaudencio Filho'
+                        email = 'terciofilho@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:https://github.com/sqids/sqids-java.git'
+                    developerConnection = 'scm:git:ssh://git@github.com:sqids/sqids-java.git'
+                    url = projectUrl
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username "${System.getenv("SONATYPE_USERNAME")}"
+                password "${System.getenv("SONATYPE_PASSWORD")}"
+            }
+        }
+    }
+    signing {
+        useGpgCmd()
+        sign publishing.publications.mavenJava
+    }
 }
