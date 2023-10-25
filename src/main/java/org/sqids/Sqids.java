@@ -831,7 +831,7 @@ public class Sqids {
                 "zoccola").collect(Collectors.toSet()));
 
         private String alphabet = DEFAULT_ALPHABET;
-        private int minLength = 0;
+        private int minLength = DEFAULT_MIN_LENGTH;
         private Set<String> blockList = DEFAULT_BLOCK_LIST;
 
         /**
