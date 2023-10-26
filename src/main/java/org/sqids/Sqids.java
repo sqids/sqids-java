@@ -153,8 +153,9 @@ public class Sqids {
             throw new RuntimeException("Reached max attempts to re-generate the ID");
         }
 
-        long offset = numbers.size();
-        for (int i = 0; i < numbers.size(); i++) {
+        final int numberSize = numbers.size();
+        long offset = numberSize;
+        for (int i = 0; i < numberSize; i++) {
             offset = offset + this.alphabet.charAt((int) (numbers.get(i) % this.alphabetLength)) + i;
         }
         offset %= this.alphabetLength;
@@ -165,7 +166,6 @@ public class Sqids {
         final char prefix = alphabetB.charAt(0);
         String alphabet = alphabetB.reverse().toString();
         final StringBuilder id = new StringBuilder().append(prefix);
-        int numberSize = numbers.size();
         for (int i = 0; i < numberSize; i++) {
             final long num = numbers.get(i);
             id.append(toId(num, alphabet.substring(1)));
