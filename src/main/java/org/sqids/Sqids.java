@@ -230,11 +230,11 @@ public class Sqids {
     }
 
     private boolean isBlockedId(final String id) {
-        String lowercaseId = id.toLowerCase();
-
+        final String lowercaseId = id.toLowerCase();
+        final int lowercaseIdLength = lowercaseId.length();
         for (String word : this.blockList) {
-            if (word.length() <= lowercaseId.length()) {
-                if (lowercaseId.length() <= 3 || word.length() <= 3) {
+            if (word.length() <= lowercaseIdLength) {
+                if (lowercaseIdLength <= 3 || word.length() <= 3) {
                     if (lowercaseId.equals(word)) {
                         return true;
                     }
