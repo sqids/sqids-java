@@ -1,5 +1,7 @@
 package org.sqids;
 
+import java.lang.reflect.Field;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -84,15 +86,40 @@ public class Sqids {
      * @return Sqids ID.
      */
     public String encode(final List<Long> numbers) {
+        return encode(numbers, Long.class);
+    }
+
+    public <T> String encode(final List<T> numbers, Class<T> type) {
         if (numbers.isEmpty()) {
             return "";
         }
-        for (Long num : numbers) {
-            if (num < 0) {
-                throw new RuntimeException("Encoding supports numbers between 0 and " + Long.MAX_VALUE);
+        long maxValue = maxValue(type);
+        for (T num : numbers) {
+            if (type == Byte.class){
+                if (((Byte) num) < 0) {
+                    throw new RuntimeException("Encoding supports numbers between 0 and " + maxValue);
+                }
+            } else if (type == Short.class) {
+                if (((Short) num) < 0) {
+                    throw new RuntimeException("Encoding supports numbers between 0 and " + maxValue);
+                }
+            } else if (type == Integer.class) {
+                if (((Integer) num) < 0) {
+                    throw new RuntimeException("Encoding supports numbers between 0 and " + maxValue);
+                }
+            } else if (type == Long.class) {
+                if (((Long) num) < 0) {
+                    throw new RuntimeException("Encoding supports numbers between 0 and " + maxValue);
+                }
+            } else if (type == BigInteger.class) {
+                if (((BigInteger) num).compareTo(BigInteger.ZERO) < 0) {
+                    throw new RuntimeException("Encoding supports numbers is positive");
+                }
+            } else {
+                throw new RuntimeException("Object type not supported");
             }
         }
-        return encodeNumbers(numbers);
+        return encodeNumbers(numbers, type);
     }
 
     /**
@@ -102,7 +129,19 @@ public class Sqids {
      * @return List of decoded numbers.
      */
     public List<Long> decode(final String id) {
-        List<Long> ret = new ArrayList<>();
+        return decode(id, Long.class);
+    }
+
+    public <T> List<T> decode(final String id, Class<T> type) {
+        if (type != Byte.class &&
+                type != Short.class &&
+                type != Integer.class &&
+                type != Long.class &&
+                type != BigInteger.class) {
+            throw new RuntimeException("Object type not supported");
+        }
+
+        List<T> ret = new ArrayList<>();
         if (id.isEmpty()) {
             return ret;
         }
@@ -134,7 +173,7 @@ public class Sqids {
                 if (chunks[0].isEmpty()) {
                     return ret;
                 }
-                ret.add(toNumber(chunks[0], alphabet.substring(1)));
+                ret.add(toNumber(chunks[0], alphabet.substring(1), type));
                 if (chunksLength > 1) {
                     alphabet = shuffle(alphabet);
                 }
@@ -144,19 +183,37 @@ public class Sqids {
         return ret;
     }
 
-    private String encodeNumbers(final List<Long> numbers) {
-        return this.encodeNumbers(numbers, 0);
+    private <T> String encodeNumbers(final List<T> numbers, Class<T> type) {
+        return this.encodeNumbers(numbers, 0, type);
     }
 
-    private String encodeNumbers(final List<Long> numbers, final int increment) {
+    private <T> String encodeNumbers(final List<T> numbers, final int increment, Class<T> type) {
         if (increment > this.alphabetLength) {
             throw new RuntimeException("Reached max attempts to re-generate the ID");
         }
 
         final int numberSize = numbers.size();
         long offset = numberSize;
-        for (int i = 0; i < numberSize; i++) {
-            offset = offset + this.alphabet.charAt((int) (numbers.get(i) % this.alphabetLength)) + i;
+        if (type == Byte.class) {
+            for (int i = 0; i < numberSize; i++) {
+                offset = offset + this.alphabet.charAt((Byte) numbers.get(i) % this.alphabetLength) + i;
+            }
+        } else if (type == Short.class) {
+            for (int i = 0; i < numberSize; i++) {
+                offset = offset + this.alphabet.charAt(((Short) numbers.get(i) % this.alphabetLength)) + i;
+            }
+        } else if (type == Integer.class) {
+            for (int i = 0; i < numberSize; i++) {
+                offset = offset + this.alphabet.charAt(((Integer) numbers.get(i) % this.alphabetLength)) + i;
+            }
+        } else if (type == Long.class) {
+            for (int i = 0; i < numberSize; i++) {
+                offset = offset + this.alphabet.charAt((int) ((Long) numbers.get(i) % this.alphabetLength)) + i;
+            }
+        } else if (type == BigInteger.class) {
+            for (int i = 0; i < numberSize; i++) {
+                offset = offset + this.alphabet.charAt(((BigInteger) numbers.get(i)).mod(BigInteger.valueOf(this.alphabetLength)).intValue()) + i;
+            }
         }
         offset %= this.alphabetLength;
         offset = (offset + increment) % this.alphabetLength;
@@ -167,8 +224,17 @@ public class Sqids {
         String alphabet = alphabetB.reverse().toString();
         final StringBuilder id = new StringBuilder().append(prefix);
         for (int i = 0; i < numberSize; i++) {
-            final long num = numbers.get(i);
-            id.append(toId(num, alphabet.substring(1)));
+            if (type == Byte.class) {
+                id.append(toId(((Byte) numbers.get(i)).longValue(), alphabet.substring(1)));
+            } else if (type == Short.class) {
+                id.append(toId(((Short) numbers.get(i)).longValue(), alphabet.substring(1)));
+            } else if (type == Integer.class) {
+                id.append(toId(((Integer) numbers.get(i)).longValue(), alphabet.substring(1)));
+            } else if (type == Long.class) {
+                id.append(toId((Long) numbers.get(i), alphabet.substring(1)));
+            } else if (type == BigInteger.class) {
+                id.append(toId((BigInteger) numbers.get(i), alphabet.substring(1)));
+            }
             if (i < numberSize - 1) {
                 id.append(alphabet.charAt(0));
                 alphabet = shuffle(alphabet);
@@ -185,7 +251,7 @@ public class Sqids {
 
         if (isBlockedId(id.toString())) {
             id.setLength(0);
-            id.append(encodeNumbers(numbers, increment + 1));
+            id.append(encodeNumbers(numbers, increment + 1, type));
         }
 
         return id.toString();
@@ -204,6 +270,19 @@ public class Sqids {
         return new String(chars);
     }
 
+    private StringBuilder toId(BigInteger num, String alphabet) {
+        StringBuilder id = new StringBuilder();
+        char[] chars = alphabet.toCharArray();
+        BigInteger charLength = BigInteger.valueOf(chars.length);
+
+        do {
+            id.append(chars[num.mod(charLength).intValue()]);
+            num = num.divide(charLength);
+        } while (num.compareTo(BigInteger.ZERO) > 0);
+
+        return id.reverse();
+    }
+
     private StringBuilder toId(long num, final String alphabet) {
         StringBuilder id = new StringBuilder();
         char[] chars = alphabet.toCharArray();
@@ -217,24 +296,62 @@ public class Sqids {
         return id.reverse();
     }
 
-    private long toNumber(final String id, final String alphabet) {
+    private <T> T toNumber(final String id, final String alphabet, Class<T> type) {
         char[] chars = alphabet.toCharArray();
         int charLength = chars.length;
-        long number = 0;
+        T number;
+        if (type == Byte.class) {
+            byte num = 0;
 
-        for (char c : id.toCharArray()) {
-            number = number * charLength + alphabet.indexOf(c);
+            for (char c : id.toCharArray()) {
+                num = (byte) (num * charLength + alphabet.indexOf(c));
+            }
+
+            number = type.cast(num);
+        } else if (type == Short.class) {
+            short num = 0;
+
+            for (char c : id.toCharArray()) {
+                num = (short) (num * charLength + alphabet.indexOf(c));
+            }
+
+            number = type.cast(num);
+        } else if (type == Integer.class) {
+            int num = 0;
+
+            for (char c : id.toCharArray()) {
+                num = num * charLength + alphabet.indexOf(c);
+            }
+
+            number = type.cast(num);
+        } else if (type == Long.class) {
+            long num = 0;
+
+            for (char c : id.toCharArray()) {
+                num = num * charLength + alphabet.indexOf(c);
+            }
+
+            number = type.cast(num);
+        } else if (type == BigInteger.class) {
+            BigInteger num = BigInteger.ZERO;
+
+            for (char c : id.toCharArray()) {
+                num = num.multiply(BigInteger.valueOf(charLength)).add(BigInteger.valueOf(alphabet.indexOf(c)));
+            }
+
+            number = type.cast(num);
+        } else {
+            throw new RuntimeException("Object type not supported");
         }
-
         return number;
     }
 
     private boolean isBlockedId(final String id) {
-        final String lowercaseId = id.toLowerCase();
-        final int lowercaseIdLength = lowercaseId.length();
+        String lowercaseId = id.toLowerCase();
+
         for (String word : this.blockList) {
-            if (word.length() <= lowercaseIdLength) {
-                if (lowercaseIdLength <= 3 || word.length() <= 3) {
+            if (word.length() <= lowercaseId.length()) {
+                if (lowercaseId.length() <= 3 || word.length() <= 3) {
                     if (lowercaseId.equals(word)) {
                         return true;
                     }
@@ -248,6 +365,28 @@ public class Sqids {
             }
         }
         return false;
+    }
+
+    private <T> long maxValue(Class<T> type) {
+        Field maxValueField;
+        long maxValue = 0;
+        try {
+            maxValueField = type.getField("MAX_VALUE");
+            if (type == Byte.class) {
+                maxValue =  ((Byte) maxValueField.get(null)).longValue();
+            } else if (type == Short.class) {
+                maxValue =  ((Short) maxValueField.get(null)).longValue();
+            } else if (type == Integer.class) {
+                maxValue =  ((Integer) maxValueField.get(null)).longValue();
+            } else if (type == Long.class) {
+                maxValue =  ((Long) maxValueField.get(null)).longValue();
+            } else if (type == BigInteger.class) {
+                maxValue =  ((BigInteger) maxValueField.get(null)).longValue();
+            }
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Object type not supported");
+        }
+        return maxValue;
     }
 
     /**
