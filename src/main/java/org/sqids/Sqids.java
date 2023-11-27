@@ -17,9 +17,9 @@ import java.util.stream.Stream;
  * This implementation is immutable and thread-safe, no lock is necessary.
  */
 public class Sqids {
-    private static final int MIN_ALPHABET_LENGTH = 3;
-    private static final int MIN_LENGTH_LIMIT = 255;
-    private static final int MIN_BLOCK_LIST_WORD_LENGTH = 3;
+    public static final int MIN_ALPHABET_LENGTH = 3;
+    public static final int MIN_LENGTH_LIMIT = 255;
+    public static final int MIN_BLOCK_LIST_WORD_LENGTH = 3;
 
     private final String alphabet;
     private final int alphabetLength;
