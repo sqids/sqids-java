@@ -124,22 +124,23 @@ public class Sqids {
                 .append(this.alphabet, 0, offset)
                 .reverse()
                 .toString();
-        String slicedId = id.substring(1);
 
-        while (!slicedId.isEmpty()) {
+        int index = 1;
+        while (true) {
             final char separator = alphabet.charAt(0);
-            final String[] chunks = slicedId.split(String.valueOf(separator), 2);
-            final int chunksLength = chunks.length;
-            if (chunksLength > 0) {
-                if (chunks[0].isEmpty()) {
-                    return ret;
-                }
-                ret.add(toNumber(chunks[0], alphabet.substring(1)));
-                if (chunksLength > 1) {
-                    alphabet = shuffle(alphabet);
-                }
+            int seperatorIndex = id.indexOf(separator, index);
+            if (seperatorIndex == -1) {
+                seperatorIndex = id.length();
+            } else if (index == seperatorIndex) {
+                break;
             }
-            slicedId = chunksLength > 1 ? chunks[1] : "";
+            ret.add(toNumber(id, index, seperatorIndex, alphabet.substring(1)));
+            index = seperatorIndex + 1;
+            if (index < id.length()) {
+                alphabet = shuffle(alphabet);
+            } else {
+                break;
+            }
         }
         return ret;
     }
@@ -217,15 +218,13 @@ public class Sqids {
         return id.reverse();
     }
 
-    private long toNumber(final String id, final String alphabet) {
-        char[] chars = alphabet.toCharArray();
-        int charLength = chars.length;
+    private long toNumber(final String id, final int fromInclusive, final int toExclusive, final String alphabet) {
+        int alphabetLength = alphabet.length();
         long number = 0;
-
-        for (char c : id.toCharArray()) {
-            number = number * charLength + alphabet.indexOf(c);
+        for (int i = fromInclusive; i < toExclusive; i++) {
+            char c = id.charAt(i);
+            number = number * alphabetLength + alphabet.indexOf(c);
         }
-
         return number;
     }
 
