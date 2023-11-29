@@ -17,9 +17,22 @@ import java.util.stream.Stream;
  * This implementation is immutable and thread-safe, no lock is necessary.
  */
 public class Sqids {
-    private static final int MIN_ALPHABET_LENGTH = 3;
-    private static final int MIN_LENGTH_LIMIT = 255;
-    private static final int MIN_BLOCK_LIST_WORD_LENGTH = 3;
+    /**
+    * The minimum allowable length of the alphabet used for encoding and
+    * decoding Sqids.
+    */
+    public static final int MIN_ALPHABET_LENGTH = 3;
+
+    /**
+     * The maximum allowable minimum length of an encoded Sqid.
+     */
+    public static final int MIN_LENGTH_LIMIT = 255;
+
+    /**
+     * The minimum length of blocked words in the block list. Any words shorter
+     * than the minimum are ignored.
+     */
+    public static final int MIN_BLOCK_LIST_WORD_LENGTH = 3;
 
     private final String alphabet;
     private final int alphabetLength;
