@@ -128,14 +128,14 @@ public class Sqids {
         int index = 1;
         while (true) {
             final char separator = alphabet.charAt(0);
-            int seperatorIndex = id.indexOf(separator, index);
-            if (seperatorIndex == -1) {
-                seperatorIndex = id.length();
-            } else if (index == seperatorIndex) {
+            int separatorIndex = id.indexOf(separator, index);
+            if (separatorIndex == -1) {
+                separatorIndex = id.length();
+            } else if (index == separatorIndex) {
                 break;
             }
-            ret.add(toNumber(id, index, seperatorIndex, alphabet.substring(1)));
-            index = seperatorIndex + 1;
+            ret.add(toNumber(id, index, separatorIndex, alphabet.substring(1)));
+            index = separatorIndex + 1;
             if (index < id.length()) {
                 alphabet = shuffle(alphabet);
             } else {
