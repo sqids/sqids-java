@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class MinLengthTests {
-    private final int minLength = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".length();
+    private final int minLength = Sqids.Builder.DEFAULT_ALPHABET.length();
 
     @Test
     public void simple() {
