@@ -28,6 +28,15 @@ public class AlphabetTests {
     }
 
     @Test
+    public void specialCharsAlphabet() {
+        Sqids sqids = Sqids.builder()
+                .alphabet(".\\?")
+                .build();
+        List<Long> numbers = Arrays.asList(1L, 2L, 3L);
+        Assertions.assertEquals(sqids.decode(sqids.encode(numbers)), numbers);
+    }
+
+    @Test
     public void multibyteCharacters() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> Sqids.builder()
                 .alphabet("ë1092")
