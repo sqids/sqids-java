@@ -1,4 +1,6 @@
 plugins {
+    id 'com.diffplug.spotless' version '6.23.1'
+    id 'com.github.node-gradle.node' version '7.0.1'
     id 'java-library'
     id 'maven-publish'
     id 'signing'
@@ -7,7 +9,7 @@ plugins {
 group = 'org.sqids'
 version = '0.1.0-SNAPSHOT'
 
-String rootArtifactiId = 'sqids'
+String rootArtifactId = 'sqids'
 String projectUrl = 'https://sqids.org/java'
 
 repositories {
@@ -17,7 +19,7 @@ repositories {
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 test {
@@ -34,10 +36,9 @@ java {
 
 publishing {
     publications {
-
         mavenJava(MavenPublication) {
             groupId = group
-            artifactId = rootArtifactiId
+            artifactId = rootArtifactId
             version = version
             from components.java
             pom {
@@ -45,9 +46,9 @@ publishing {
                 description = 'Generate short YouTube-looking IDs from numbers.'
                 url = projectUrl
                 properties = [
-                    "parent.groupId": "org.sonatype.oss",
-                    "parent.artifactId": "oss-parent",
-                    "parent.version": "7"
+                    'parent.groupId': 'org.sonatype.oss',
+                    'parent.artifactId': 'oss-parent',
+                    'parent.version': '7'
                 ]
                 licenses {
                     license {
@@ -72,12 +73,12 @@ publishing {
     }
     repositories {
         maven {
-            def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
-            def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+            String releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            String snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials {
-                username "${System.getenv("SONATYPE_USERNAME")}"
-                password "${System.getenv("SONATYPE_PASSWORD")}"
+                username System.getenv('SONATYPE_USERNAME')
+                password System.getenv('SONATYPE_PASSWORD')
             }
         }
     }
@@ -85,4 +86,32 @@ publishing {
         useGpgCmd()
         sign publishing.publications.mavenJava
     }
+}
+
+node {
+    download = true
+}
+
+String nodeSetup = 'nodeSetup'
+String npmSetup = 'npmSetup'
+
+spotless {
+    format 'prettier', {
+        target '**/*.java', '**/*.properties', '**/*.md', '**/*.yml', '**/*.yaml'
+        targetExclude 'bin/**/*', 'gradle/**/*'
+
+        boolean isWindows = System.getProperty('os.name').toLowerCase().contains('windows')
+        String nodeExec = isWindows ? '/node.exe' : '/bin/node'
+        String npmExec = isWindows ? '/npm.cmd' : '/bin/npm'
+
+        prettier(['prettier': '3.1.0', 'prettier-plugin-java': '2.2.0', 'prettier-plugin-properties': '0.3.0'])
+        .npmInstallCache()
+        .npmExecutable("${tasks.named(npmSetup).get().npmDir.get()}${npmExec}")
+        .nodeExecutable("${tasks.named(nodeSetup).get().nodeDir.get()}${nodeExec}")
+        .configFile('.prettierrc.yaml')
+    }
+}
+
+tasks.named('spotlessPrettier').configure { task ->
+    task.dependsOn(nodeSetup, npmSetup)
 }

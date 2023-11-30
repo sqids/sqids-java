@@ -1,0 +1,14 @@
+repos:
+    - repo: local
+      hooks:
+          - id: spotless
+            name: spotless
+            language: system
+            entry: ./gradlew spotlessApply
+            pass_filenames: false
+            always_run: true
+          - id: git-diff
+            name: git-diff
+            language: system
+            entry: git --no-pager diff --color --exit-code
+            always_run: true
