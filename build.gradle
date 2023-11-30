@@ -110,10 +110,6 @@ spotless {
         .nodeExecutable("${tasks.named(nodeSetup).get().nodeDir.get()}${nodeExec}")
         .configFile('.prettierrc.yaml')
     }
-
-    groovyGradle {
-        greclipse().configFile('.greclipse.properties')
-    }
 }
 
 tasks.named('spotlessPrettier').configure { task ->
