@@ -1,0 +1,4 @@
+plugins:
+    - prettier-plugin-java
+    - prettier-plugin-properties
+tabWidth: 4
