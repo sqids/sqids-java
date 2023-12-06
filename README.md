@@ -1,4 +1,7 @@
 # [Sqids Java](https://sqids.org/java)
+[![javadoc](https://javadoc.io/badge2/org.sqids/sqids/javadoc.svg)](https://javadoc.io/doc/org.sqids/sqids)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.sqids/sqids/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.sqids/sqids)
+
 
 [Sqids](https://sqids.org/java) (*pronounced "squids"*) is a small library that lets you **generate unique IDs from
 numbers**. It's good for link shortening, fast & URL-safe ID generation and decoding back into numbers for quicker
@@ -34,13 +37,29 @@ Java 8 or higher is required.
 
 ## 🚀 Getting started
 
-Download and Import Sqids via:
+Import dependency. If you are using Apache Maven, add the following dependency to your pom.xml's dependencies:
+
+```
+<dependency>
+  <groupId>org.sqids</groupId>
+  <artifactId>sqids</artifactId>
+  <version>0.1.0</version>
+</dependency>
+```    
+
+Alternatively, if you use Gradle or are on Android, add the following to your app's `build.gradle` file under dependencies:
+
+```
+implementation 'org.sqids:sqids:0.1.0'
+```
+
+## 👩‍💻 Examples
+
+Import Sqids via:
 
 ```java
 import org.sqids.Sqids;
 ```
-
-## 👩‍💻 Examples
 
 Simple encode & decode:
 
